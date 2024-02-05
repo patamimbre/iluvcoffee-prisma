@@ -7,6 +7,7 @@ import { LoggerModule } from "@core/logger/logger.module";
 import { UserModule } from "@contexts/users/user.module";
 
 import { CoffeesModule } from "./contexts/coffees/coffees.module";
+import { PrismaModule } from "./core/prisma/prisma.module";
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { CoffeesModule } from "./contexts/coffees/coffees.module";
     HealthModule,
     UserModule,
     CoffeesModule,
+    PrismaModule,
   ],
 })
 export class AppModule {}
