@@ -19,6 +19,8 @@ services:
         reservations:
           cpus: "0.25"
           memory: "256m"
+    depends_on:
+      - postgres
 
   my-service-dev:
     container_name: my-service-dev
@@ -35,6 +37,8 @@ services:
     volumes:
       - .:/project
       - node_modules:/project/node_modules/
+    depends_on:
+      - postgres
     deploy:
       resources:
         limits:
@@ -44,5 +48,19 @@ services:
           cpus: "0.25"
           memory: "256m"
 
+  postgres:
+    image: postgres:14
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: your_username
+      # TODO: Change this to a secure password
+      POSTGRES_PASSWORD: your_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
 volumes:
   node_modules:
+  postgres_data:
