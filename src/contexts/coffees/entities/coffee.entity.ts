@@ -1,8 +1,8 @@
-import { Coffee as PrismaCoffee } from "@prisma/client";
+import * as Prisma from "@prisma/client";
 
-export class Coffee implements PrismaCoffee {
+export class Coffee implements Prisma.Coffee {
   id!: number;
   name!: string;
   brand!: string;
-  flavors!: string[];
+  flavors?: Prisma.Flavor[];
 }

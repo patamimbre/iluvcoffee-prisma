@@ -6,6 +6,10 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
 async function main() {
+  await prisma.flavor.createMany({
+    data: [{ name: "Vanilla" }, { name: "Caramel" }, { name: "Chocolate" }],
+  });
+
   // create two dummy coffees
   const coffee1 = await prisma.coffee.upsert({
     where: { name: "Delicious Coffee" },
@@ -13,7 +17,7 @@ async function main() {
     create: {
       name: "Delicious Coffee",
       brand: "Nestle",
-      flavors: ["Vanilla", "Caramel"],
+      flavors: { connect: [{ name: "Vanilla" }, { name: "Chocolate" }] },
     },
   });
 
@@ -23,7 +27,7 @@ async function main() {
     create: {
       name: "Espresso",
       brand: "Starbucks",
-      flavors: ["Chocolate", "Caramel"],
+      flavors: { connect: [{ name: "Vanilla" }, { name: "Caramel" }] },
     },
   });
 

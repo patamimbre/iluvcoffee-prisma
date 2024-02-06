@@ -14,6 +14,7 @@ import { PrismaService } from "@src/core/prisma/prisma.service";
 import { CreateCoffeeDto } from "./dto/create-coffee.dto";
 import { UpdateCoffeeDto } from "./dto/update-coffee.dto";
 import { Coffee } from "./entities/coffee.entity";
+import { Flavor } from "./entities/flavor.entity";
 
 @Injectable()
 export class CoffeesService {
@@ -23,12 +24,14 @@ export class CoffeesService {
     return this.prisma.coffee.findMany({
       take: limit,
       skip: offset,
+      include: { flavors: true },
     });
   }
 
   async findOne(id: number): Promise<Coffee> {
     const coffee = await this.prisma.coffee.findUnique({
       where: { id },
+      include: { flavors: true },
     });
     if (!coffee) throw new NotFoundException(`Coffee #${id} not found`);
     return coffee;
@@ -36,8 +39,16 @@ export class CoffeesService {
 
   async create(createCoffeeDto: CreateCoffeeDto): Promise<Coffee> {
     try {
+      const flavors = await this.preloadFlavorsByName(createCoffeeDto.flavors);
+
       return await this.prisma.coffee.create({
-        data: createCoffeeDto,
+        data: {
+          ...createCoffeeDto,
+          flavors: {
+            connect: flavors.map(({ id }) => ({ id })),
+          },
+        },
+        include: { flavors: true },
       });
     } catch (error) {
       if (isUniqueConstraintFailedError(error)) {
@@ -52,9 +63,19 @@ export class CoffeesService {
     updateCoffeeDto: UpdateCoffeeDto,
   ): Promise<Coffee | null> {
     try {
+      const flavors =
+        updateCoffeeDto.flavors &&
+        (await this.preloadFlavorsByName(updateCoffeeDto.flavors));
+
       return await this.prisma.coffee.update({
         where: { id },
-        data: updateCoffeeDto,
+        data: {
+          ...updateCoffeeDto,
+          flavors: {
+            set: flavors?.map(({ id }) => ({ id })),
+          },
+        },
+        include: { flavors: true },
       });
     } catch (error) {
       if (isPrismaNotFoundError(error)) {
@@ -78,5 +99,19 @@ export class CoffeesService {
       }
       throw error;
     }
+  }
+
+  private async preloadFlavorByName(name: string): Promise<Flavor> {
+    const flavor = await this.prisma.flavor.findUnique({
+      where: { name },
+    });
+    if (flavor) return flavor;
+    return await this.prisma.flavor.create({
+      data: { name },
+    });
+  }
+
+  private async preloadFlavorsByName(names: string[]): Promise<Flavor[]> {
+    return Promise.all(names.map(name => this.preloadFlavorByName(name)));
   }
 }
