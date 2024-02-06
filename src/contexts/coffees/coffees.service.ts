@@ -39,13 +39,15 @@ export class CoffeesService {
 
   async create(createCoffeeDto: CreateCoffeeDto): Promise<Coffee> {
     try {
-      const flavors = await this.preloadFlavorsByName(createCoffeeDto.flavors);
+      const flavors =
+        createCoffeeDto.flavors &&
+        (await this.preloadFlavorsByName(createCoffeeDto.flavors));
 
       return await this.prisma.coffee.create({
         data: {
           ...createCoffeeDto,
           flavors: {
-            connect: flavors.map(({ id }) => ({ id })),
+            connect: flavors?.map(({ id }) => ({ id })),
           },
         },
         include: { flavors: true },
