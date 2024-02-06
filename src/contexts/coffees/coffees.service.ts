@@ -60,6 +60,9 @@ export class CoffeesService {
       if (isPrismaNotFoundError(error)) {
         throw new NotFoundException(`Coffee #${id} not found`);
       }
+      if (isUniqueConstraintFailedError(error)) {
+        throw new BadRequestException("Coffee name must be unique");
+      }
       throw error;
     }
   }
