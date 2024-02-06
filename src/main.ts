@@ -14,6 +14,9 @@ async function bootstrap() {
     new FastifyAdapter(),
   );
 
+  const configService = app.get(ConfigService);
+  const port = configService.get<string>("PORT", "3000");
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
@@ -24,9 +27,6 @@ async function bootstrap() {
       },
     }),
   );
-
-  const configService = app.get(ConfigService);
-  const port = configService.get<string>("PORT", "3000");
 
   await app.listen(port, "0.0.0.0");
 

@@ -1,15 +1,7 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from "@nestjs/common";
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { PrismaService } from "nestjs-prisma";
 
 import { PaginationQueryDto } from "@src/core/common/dto/pagination-query.dto";
-import {
-  isPrismaNotFoundError,
-  isUniqueConstraintFailedError,
-} from "@src/core/prisma/prisma.exceptions";
-import { PrismaService } from "@src/core/prisma/prisma.service";
 
 import { CreateCoffeeDto } from "./dto/create-coffee.dto";
 import { UpdateCoffeeDto } from "./dto/update-coffee.dto";
@@ -38,69 +30,45 @@ export class CoffeesService {
   }
 
   async create(createCoffeeDto: CreateCoffeeDto): Promise<Coffee> {
-    try {
-      const flavors =
-        createCoffeeDto.flavors &&
-        (await this.preloadFlavorsByName(createCoffeeDto.flavors));
+    const flavors =
+      createCoffeeDto.flavors &&
+      (await this.preloadFlavorsByName(createCoffeeDto.flavors));
 
-      return await this.prisma.coffee.create({
-        data: {
-          ...createCoffeeDto,
-          flavors: {
-            connect: flavors?.map(({ id }) => ({ id })),
-          },
+    return await this.prisma.coffee.create({
+      data: {
+        ...createCoffeeDto,
+        flavors: {
+          connect: flavors?.map(({ id }) => ({ id })),
         },
-        include: { flavors: true },
-      });
-    } catch (error) {
-      if (isUniqueConstraintFailedError(error)) {
-        throw new BadRequestException("Coffee name must be unique");
-      }
-      throw error;
-    }
+      },
+      include: { flavors: true },
+    });
   }
 
   async update(
     id: number,
     updateCoffeeDto: UpdateCoffeeDto,
   ): Promise<Coffee | null> {
-    try {
-      const flavors =
-        updateCoffeeDto.flavors &&
-        (await this.preloadFlavorsByName(updateCoffeeDto.flavors));
+    const flavors =
+      updateCoffeeDto.flavors &&
+      (await this.preloadFlavorsByName(updateCoffeeDto.flavors));
 
-      return await this.prisma.coffee.update({
-        where: { id },
-        data: {
-          ...updateCoffeeDto,
-          flavors: {
-            set: flavors?.map(({ id }) => ({ id })),
-          },
+    return await this.prisma.coffee.update({
+      where: { id },
+      data: {
+        ...updateCoffeeDto,
+        flavors: {
+          set: flavors?.map(({ id }) => ({ id })),
         },
-        include: { flavors: true },
-      });
-    } catch (error) {
-      if (isPrismaNotFoundError(error)) {
-        throw new NotFoundException(`Coffee #${id} not found`);
-      }
-      if (isUniqueConstraintFailedError(error)) {
-        throw new BadRequestException("Coffee name must be unique");
-      }
-      throw error;
-    }
+      },
+      include: { flavors: true },
+    });
   }
 
   async remove(id: number): Promise<Coffee> {
-    try {
-      return await this.prisma.coffee.delete({
-        where: { id },
-      });
-    } catch (error) {
-      if (isPrismaNotFoundError(error)) {
-        throw new NotFoundException(`Coffee #${id} not found`);
-      }
-      throw error;
-    }
+    return await this.prisma.coffee.delete({
+      where: { id },
+    });
   }
 
   private async preloadFlavorByName(name: string): Promise<Flavor> {
