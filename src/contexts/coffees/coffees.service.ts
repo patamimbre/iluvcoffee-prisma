@@ -1,6 +1,14 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 
-import { isPrismaNotFoundError } from "@src/core/prisma/prisma.exceptions";
+import { PaginationQueryDto } from "@src/core/common/dto/pagination-query.dto";
+import {
+  isPrismaNotFoundError,
+  isUniqueConstraintFailedError,
+} from "@src/core/prisma/prisma.exceptions";
 import { PrismaService } from "@src/core/prisma/prisma.service";
 
 import { CreateCoffeeDto } from "./dto/create-coffee.dto";
@@ -11,8 +19,11 @@ import { Coffee } from "./entities/coffee.entity";
 export class CoffeesService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findAll(): Promise<Coffee[]> {
-    return this.prisma.coffee.findMany();
+  findAll({ limit, offset }: PaginationQueryDto): Promise<Coffee[]> {
+    return this.prisma.coffee.findMany({
+      take: limit,
+      skip: offset,
+    });
   }
 
   async findOne(id: number): Promise<Coffee> {
@@ -23,10 +34,17 @@ export class CoffeesService {
     return coffee;
   }
 
-  create(createCoffeeDto: CreateCoffeeDto): Promise<Coffee> {
-    return this.prisma.coffee.create({
-      data: createCoffeeDto,
-    });
+  async create(createCoffeeDto: CreateCoffeeDto): Promise<Coffee> {
+    try {
+      return await this.prisma.coffee.create({
+        data: createCoffeeDto,
+      });
+    } catch (error) {
+      if (isUniqueConstraintFailedError(error)) {
+        throw new BadRequestException("Coffee name must be unique");
+      }
+      throw error;
+    }
   }
 
   async update(
