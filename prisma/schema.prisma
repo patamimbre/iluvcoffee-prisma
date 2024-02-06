@@ -15,10 +15,14 @@ model Coffee {
   name        String   @unique
   brand       String
   flavors     Flavor[]
+
+  @@index([name, brand])
 }
 
 model Flavor {
   id          Int      @id @default(autoincrement())
   name        String   @unique
   coffees     Coffee[]
+
+  @@index([name])
 }
