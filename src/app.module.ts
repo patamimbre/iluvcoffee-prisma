@@ -9,9 +9,9 @@ import {
 import { HealthModule } from "@core/health/health.module";
 import { LoggerModule } from "@core/logger/logger.module";
 
-import { UserModule } from "@contexts/users/user.module";
-
 import { CoffeesModule } from "./contexts/coffees/coffees.module";
+import { UsersModule } from "./contexts/users/users.module";
+import { IamModule } from "./core/iam/iam.module";
 
 @Module({
   imports: [
@@ -22,8 +22,9 @@ import { CoffeesModule } from "./contexts/coffees/coffees.module";
     }),
     LoggerModule,
     HealthModule,
-    UserModule,
     CoffeesModule,
+    UsersModule,
+    IamModule,
   ],
   providers: [providePrismaClientExceptionFilter()],
 })

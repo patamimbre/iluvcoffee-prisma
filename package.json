@@ -46,6 +46,7 @@
     "@nestjs/mapped-types": "^2.0.4",
     "@nestjs/platform-fastify": "^10.3.1",
     "@prisma/client": "5.9.1",
+    "argon2": "^0.31.2",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.1",
     "nestjs-prisma": "^0.23.0",
