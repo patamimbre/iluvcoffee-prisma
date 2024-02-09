@@ -65,8 +65,8 @@ devDependencies:
     specifier: ^10.1.0
     version: 10.1.0(chokidar@3.6.0)(typescript@5.3.3)
   '@nestjs/testing':
-    specifier: ^10.3.1
-    version: 10.3.1(@nestjs/common@10.3.1)(@nestjs/core@10.3.2)
+    specifier: ^10.3.2
+    version: 10.3.2(@nestjs/common@10.3.1)(@nestjs/core@10.3.2)
   '@swc/cli':
     specifier: ^0.3.9
     version: 0.3.9(@swc/core@1.4.0)
@@ -1414,8 +1414,8 @@ packages:
     transitivePeerDependencies:
       - chokidar
 
-  /@nestjs/testing@10.3.1(@nestjs/common@10.3.1)(@nestjs/core@10.3.2):
-    resolution: {integrity: sha512-74aSAugWT31jSPnStyRWDXgjHXWO3GYaUfAZ2T7Dml88UGkGy95iwaWgYy7aYM8/xVFKcDYkfL5FAYqZYce/yg==}
+  /@nestjs/testing@10.3.2(@nestjs/common@10.3.1)(@nestjs/core@10.3.2):
+    resolution: {integrity: sha512-jetqEPqOPuxmhBinkizmJQg4UZ2IRFrUoMrBDSgg0ogQClokKjnLgkoC5de+Jfm2kub/VpqorHB0me8cCr5jEQ==}
     peerDependencies:
       '@nestjs/common': ^10.0.0
       '@nestjs/core': ^10.0.0
