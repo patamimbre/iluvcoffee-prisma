@@ -1,6 +1,9 @@
-import { Injectable, UnauthorizedException } from "@nestjs/common";
+import { Inject, Injectable, UnauthorizedException } from "@nestjs/common";
+import { ConfigType } from "@nestjs/config";
+import { JwtService } from "@nestjs/jwt";
 import { PrismaService } from "nestjs-prisma";
 
+import jwtConfig from "../config/jwt.config";
 import { HashingService } from "../hashing/hashing.service";
 import { SignInDto } from "./dto/sign-in.dto";
 import { SignUpDto } from "./dto/sign-up.dto";
@@ -10,6 +13,9 @@ export class AuthenticationService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly hashingService: HashingService,
+    private readonly jwtService: JwtService,
+    @Inject(jwtConfig.KEY)
+    private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
 
   async signUp(signUpDto: SignUpDto): Promise<void> {
@@ -24,7 +30,7 @@ export class AuthenticationService {
     });
   }
 
-  async signIn(signInDto: SignInDto): Promise<void> {
+  async signIn(signInDto: SignInDto): Promise<{ accessToken: string }> {
     const error = new UnauthorizedException("Invalid credentials");
 
     const { email, password } = signInDto;
@@ -47,6 +53,19 @@ export class AuthenticationService {
       throw error;
     }
 
-    return;
+    const accessToken = await this.jwtService.signAsync(
+      {
+        sub: user.id,
+        email: user.email,
+      },
+      {
+        audience: this.jwtConfiguration.audience,
+        issuer: this.jwtConfiguration.issuer,
+        expiresIn: this.jwtConfiguration.accessTokenTtl,
+        secret: this.jwtConfiguration.secret,
+      },
+    );
+
+    return { accessToken };
   }
 }
