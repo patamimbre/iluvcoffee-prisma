@@ -11,7 +11,7 @@ import { FastifyRequest } from "fastify";
 
 import jwtConfig from "../../config/jwt.config";
 import { BEARER_PREFIX, REQUEST_USER_KEY } from "../../iam.constants";
-import { FastifyRequestWithPayload, JwtPayload } from "../../iam.types";
+import { ActiveUserData, FastifyRequestWithPayload } from "../../iam.types";
 
 @Injectable()
 export class AccessTokenGuard implements CanActivate {
@@ -30,7 +30,7 @@ export class AccessTokenGuard implements CanActivate {
     if (!token) throw new UnauthorizedException();
 
     try {
-      const payload = await this.jwtService.verifyAsync<JwtPayload>(
+      const payload = await this.jwtService.verifyAsync<ActiveUserData>(
         token,
         this.jwtConfiguration,
       );

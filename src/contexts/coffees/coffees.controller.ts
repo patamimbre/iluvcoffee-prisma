@@ -10,6 +10,8 @@ import {
 } from "@nestjs/common";
 
 import { PaginationQueryDto } from "@src/core/common/dto/pagination-query.dto";
+import { ActiveUser } from "@src/core/iam/decorators/active-user.decorator";
+import { ActiveUserData } from "@src/core/iam/iam.types";
 
 import { CoffeesService } from "./coffees.service";
 import { CreateCoffeeDto } from "./dto/create-coffee.dto";
@@ -19,7 +21,10 @@ import { UpdateCoffeeDto } from "./dto/update-coffee.dto";
 export class CoffeesController {
   constructor(private readonly coffeesService: CoffeesService) {}
   @Get()
-  findAll(@Query() paginationQuery: PaginationQueryDto) {
+  findAll(
+    @Query() paginationQuery: PaginationQueryDto,
+    @ActiveUser() _user: ActiveUserData,
+  ) {
     return this.coffeesService.findAll(paginationQuery);
   }
 
